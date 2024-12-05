@@ -82,7 +82,7 @@ func part2(f *os.File) int {
 		order := strings.Split(line, ",")
 	retry:
 		orderSoFar := make([]string, 0, len(order))
-		for i, _ := range order {
+		for i := range order {
 			for _, laterPage := range rules[order[i]] {
 				if slices.Contains(orderSoFar, laterPage) {
 					startedBad = true
