@@ -21,7 +21,7 @@ func main() {
 	start = time.Now()
 	result = part2(f2)
 	end = time.Since(start)
-	fmt.Println("Part 1:", result, "Time:", end)
+	fmt.Println("Part 2:", result, "Time:", end)
 }
 
 type position struct {
@@ -95,24 +95,19 @@ func part2(f *os.File) int {
 		}
 	}
 
-	checks := 0
 	for i, line := range grid {
 		for j := range line {
-			guardPosition := startGuardPosition
-			guardDirection := startGuardDirection
-
+			guardPosition, guardDirection := startGuardPosition, startGuardDirection
 			if guardPosition.x == j && guardPosition.y == i {
 				continue
 			}
-			checks++
 
-			cellVisits := make(map[position]int)
+			cellVisits := make(map[string]int)
 			gridCopy := copyGrid(grid)
 			gridCopy[i][j] = '#'
-			out := false
-			loop := false
+			out, loop := false, false
 			for !out && !loop {
-				cellVisits[guardPosition]++
+				cellVisits[cellVisitString(guardPosition, guardDirection)]++
 				nextPosition := position{guardPosition.x + guardDirection.x, guardPosition.y + guardDirection.y}
 				if nextPosition.x < 0 || nextPosition.x >= len(gridCopy[guardPosition.y]) || nextPosition.y < 0 || nextPosition.y >= len(gridCopy) {
 					out = true
@@ -121,10 +116,14 @@ func part2(f *os.File) int {
 				if gridCopy[nextPosition.y][nextPosition.x] == '#' {
 					guardDirection = rotate(guardDirection)
 					nextPosition = position{guardPosition.x + guardDirection.x, guardPosition.y + guardDirection.y}
+					if gridCopy[nextPosition.y][nextPosition.x] == '#' { // Dumb way to check if obstacles form a corner
+						guardDirection = rotate(guardDirection)
+						nextPosition = position{guardPosition.x + guardDirection.x, guardPosition.y + guardDirection.y}
+					}
 				}
 				guardPosition = nextPosition
 
-				if cellVisits[guardPosition] > 4 {
+				if cellVisits[cellVisitString(guardPosition, guardDirection)] > 1 {
 					loop = true
 					result++
 				}
@@ -178,4 +177,8 @@ func copyGrid(grid [][]rune) [][]rune {
 		copy(gridCopy[i], line)
 	}
 	return gridCopy
+}
+
+func cellVisitString(p position, d direction) string {
+	return fmt.Sprintf("%d,%d,%d,%d", p.x, p.y, d.x, d.y)
 }
