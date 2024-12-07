@@ -102,3 +102,45 @@ func rec2(start, target int, numbers []int) bool {
 
 	return false
 }
+
+func part1and2(f *os.File) (int, int) {
+	r1, r2 := 0, 0
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		parts := strings.Split(line, ": ")
+		target, _ := strconv.Atoi(parts[0])
+		numbers := make([]int, 0)
+		for _, numberStr := range strings.Split(parts[1], " ") {
+			number, _ := strconv.Atoi(numberStr)
+			numbers = append(numbers, number)
+		}
+		if rec(0, target, numbers, false) {
+			r1 += target
+		}
+		if rec(0, target, numbers, true) {
+			r2 += target
+		}
+	}
+	return r1, r2
+}
+
+func rec(start, target int, numbers []int, isPart2 bool) bool {
+	if len(numbers) == 0 && start == target {
+		return true
+	}
+	if len(numbers) == 0 {
+		return false
+	}
+	if rec(start+numbers[0], target, numbers[1:], isPart2) ||
+		rec(start*numbers[0], target, numbers[1:], isPart2) {
+		return true
+	}
+	if isPart2 {
+		concat, _ := strconv.Atoi(fmt.Sprintf("%d%d", start, numbers[0]))
+		if rec(concat, target, numbers[1:], isPart2) {
+			return true
+		}
+	}
+	return false
+}
