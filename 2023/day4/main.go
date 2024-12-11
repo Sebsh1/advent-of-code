@@ -49,6 +49,7 @@ func part1(f *os.File) int {
 	return result
 }
 
+// TODO - implement part2?
 func part2(f *os.File) int {
 	result := 0
 
