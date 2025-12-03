@@ -22,8 +22,8 @@ func part1(f *os.File) int {
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
-		line := scanner.Text()
 		max := 0
+		line := scanner.Text()
 		for i := 0; i < len(line); i++ {
 			for j := i + 1; j < len(line); j++ {
 				if i == j {
@@ -48,12 +48,26 @@ func part2(f *os.File) int {
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
-		numbers := make([]int, len(line))
-		for i := 0; i < len(line); i++ {
-			num, _ := strconv.Atoi(string(line[i]))
-			numbers[i] = num
+		digits := ""
+		startIdx := 0
+
+		for len(digits) < 12 {
+			max := byte('0')
+			idx := startIdx
+			remaining := 12 - len(digits)
+			endIdx := len(line) - remaining
+			for i := startIdx; i <= endIdx; i++ {
+				if line[i] > max {
+					max = line[i]
+					idx = i
+				}
+			}
+			digits += string(max)
+			startIdx = idx + 1
 		}
 
+		num, _ := strconv.Atoi(digits)
+		result += num
 	}
 
 	return result
