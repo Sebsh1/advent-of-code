@@ -26,9 +26,6 @@ func part1(f *os.File) int {
 		line := scanner.Text()
 		for i := 0; i < len(line); i++ {
 			for j := i + 1; j < len(line); j++ {
-				if i == j {
-					continue
-				}
 				num, _ := strconv.Atoi(string(line[i]) + string(line[j]))
 				if num > max {
 					max = num
