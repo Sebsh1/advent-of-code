@@ -4,33 +4,26 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"time"
 )
 
 func main() {
 	f1, _ := os.Open("2025/day4/input.txt")
 	defer f1.Close()
-	now := time.Now()
-	result1 := part1(f1)
-	elapsed := time.Since(now)
-	fmt.Println("Part 1:", result1, "Time:", elapsed)
+	fmt.Println("Part 1:", part1(f1))
 
 	f2, _ := os.Open("2025/day4/input.txt")
 	defer f2.Close()
-	now = time.Now()
-	result2 := part2(f2)
-	elapsed = time.Since(now)
-	fmt.Println("Part 2:", result2, "Time:", elapsed)
+	fmt.Println("Part 2:", part2(f2))
+}
+
+var directions = [][2]int{
+	{-1, -1}, {-1, 0}, {-1, 1},
+	{0, -1}, {0, 1},
+	{1, -1}, {1, 0}, {1, 1},
 }
 
 func getAdjacent(grid []string, x, y int) []byte {
 	adjacent := make([]byte, 0)
-	directions := [][2]int{
-		{-1, -1}, {-1, 0}, {-1, 1},
-		{0, -1}, {0, 1},
-		{1, -1}, {1, 0}, {1, 1},
-	}
-
 	for _, dir := range directions {
 		newX, newY := x+dir[0], y+dir[1]
 		if newX >= 0 && newX < len(grid[0]) && newY >= 0 && newY < len(grid) {
@@ -42,14 +35,13 @@ func getAdjacent(grid []string, x, y int) []byte {
 }
 
 func part1(f *os.File) int {
-	result := 0
-
 	grid := make([]string, 0)
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		grid = append(grid, scanner.Text())
 	}
 
+	result := 0
 	for y := 0; y < len(grid); y++ {
 		for x := 0; x < len(grid[0]); x++ {
 			if grid[y][x] != '@' {
@@ -72,14 +64,14 @@ func part1(f *os.File) int {
 
 func part2(f *os.File) int {
 	result := 0
-	taken := make(map[[2]int]struct{})
+	toRemove := make(map[[2]int]struct{})
 	grid := make([]string, 0)
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		grid = append(grid, scanner.Text())
 	}
 
-doLoop:
+loop:
 	for y := 0; y < len(grid); y++ {
 		for x := 0; x < len(grid[0]); x++ {
 			if grid[y][x] != '@' {
@@ -93,16 +85,17 @@ doLoop:
 			}
 			if count < 4 {
 				result++
-				taken[[2]int{x, y}] = struct{}{}
+				toRemove[[2]int{x, y}] = struct{}{}
 			}
 		}
 	}
-	for pos := range taken {
+
+	for pos := range toRemove {
 		grid[pos[1]] = grid[pos[1]][:pos[0]] + "." + grid[pos[1]][pos[0]+1:]
 	}
-	if len(taken) > 0 {
-		taken = make(map[[2]int]struct{})
-		goto doLoop
+	if len(toRemove) > 0 {
+		toRemove = make(map[[2]int]struct{})
+		goto loop
 	}
 
 	return result
