@@ -68,13 +68,14 @@ func part2(f *os.File) int {
 	merged := make([][2]int, 0)
 	current := intervals[0]
 	for i := 1; i < len(intervals); i++ {
-		if intervals[i][0] <= current[1] {
-			if intervals[i][1] > current[1] {
-				current[1] = intervals[i][1]
+		next := intervals[i]
+		if next[0] <= current[1] {
+			if next[1] > current[1] {
+				current[1] = next[1]
 			}
 		} else {
 			merged = append(merged, current)
-			current = intervals[i]
+			current = next
 		}
 	}
 	merged = append(merged, current)
